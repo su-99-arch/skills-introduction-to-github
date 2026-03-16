@@ -1,0 +1,107 @@
+<!-- pages/lbs/lbs.wxml -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="header">
+    <text class="title">📍 我的位置</text>
+  </view>
+
+  <!-- 地图区域 -->
+  <view class="map-container">
+    <map
+      id="lbsMap"
+      latitude="{{latitude}}"
+      longitude="{{longitude}}"
+      scale="{{mapScale}}"
+      markers="{{markers}}"
+      show-location="{{true}}"
+      class="map"
+    ></map>
+  </view>
+
+  <!-- 位置信息卡片 -->
+  <view class="location-card">
+    <view wx:if="{{loading}}" class="loading-box">
+      <view class="loading-icon">⏳</view>
+      <text class="loading-text">正在获取位置...</text>
+    </view>
+
+    <view wx:elif="{{errorMsg}}" class="error-box">
+      <text class="error-icon">⚠️</text>
+      <text class="error-text">{{errorMsg}}</text>
+      <button class="retry-btn" bindtap="onGetLocation">重新获取</button>
+    </view>
+
+    <view wx:else class="info-box">
+      <view class="info-row">
+        <text class="info-label">当前地址</text>
+        <text class="info-value">{{address || '暂未获取'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">经度</text>
+        <text class="info-value">{{longitude || '--'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">纬度</text>
+        <text class="info-value">{{latitude || '--'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">精度</text>
+        <text class="info-value">{{accuracy ? accuracy + ' 米' : '--'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-group">
+    <button class="action-btn primary" bindtap="onGetLocation">
+      📡 刷新位置
+    </button>
+    <button class="action-btn secondary" bindtap="onChooseLocation">
+      🗺️ 选择位置
+    </button>
+  </view>
+
+  <!-- 附近农业服务 -->
+  <view class="nearby-section">
+    <view class="section-header">
+      <text class="section-title">附近农业服务</text>
+      <view class="keyword-tabs">
+        <text
+          class="keyword-tab {{activeKeyword === item ? 'active' : ''}}"
+          wx:for="{{keywords}}"
+          wx:key="*this"
+          wx:item="item"
+          data-keyword="{{item}}"
+          bindtap="onKeywordTap"
+        >{{item}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{nearbyLoading}}" class="nearby-loading">
+      <text>搜索中...</text>
+    </view>
+
+    <view wx:elif="{{nearbyList.length === 0 && !nearbyLoading}}" class="nearby-empty">
+      <text>暂无附近{{activeKeyword}}，请先获取位置</text>
+    </view>
+
+    <view wx:else class="nearby-list">
+      <view
+        class="nearby-item"
+        wx:for="{{nearbyList}}"
+        wx:key="id"
+        bindtap="onNearbyItemTap"
+        data-item="{{item}}"
+      >
+        <view class="nearby-item-left">
+          <text class="nearby-name">{{item.title}}</text>
+          <text class="nearby-address">{{item.address}}</text>
+        </view>
+        <view class="nearby-item-right">
+          <text class="nearby-distance">{{item.distanceStr}}</text>
+          <text class="nearby-nav" bindtap="onNavigate" data-item="{{item}}" catchtap="true">导航</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
